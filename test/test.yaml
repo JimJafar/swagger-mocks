@@ -1,0 +1,159 @@
+swagger: '2.0'
+schemes:
+  - https
+host: some-api.net
+basePath: /api/invoice
+info:
+  version: 1.0.0
+  title: The test service
+paths:
+  '/endpoint/{someParam}':
+    get:
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      description: GETs a test amount.
+      parameters:
+        - name: someParam
+          description: Some path parameter
+          in: path
+          required: true
+          type: string
+        - name: some-header
+          description: Some required request header
+          in: header
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Response to a successful request
+          schema:
+            $ref: '#/definitions/ResponseBody'
+        default:
+          description: Response to a failed / errored request (anything other than 200)
+          schema:
+            $ref: '#/definitions/ErrorResponseBody'
+    put:
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      description: PUTs a test amount.
+      parameters:
+        - name: someParam
+          description: Some path parameter
+          in: path
+          required: true
+          type: string
+        - name: some-header
+          description: Some required request header
+          in: header
+          type: string
+          required: true
+        - name: payload
+          in: body
+          schema:
+            $ref: '#/definitions/PutBody'
+      responses:
+        '200':
+          description: Response to a successful request
+          schema:
+            $ref: '#/definitions/ResponseBody'
+        default:
+          description: Response to a failed / errored request (anything other than 200)
+          schema:
+            $ref: '#/definitions/ErrorResponseBody'
+
+# Definitions for the various JSON schemas the service consumes and produces
+definitions:
+
+  PutBody:
+    description: The body of a PUT request (standard for all services)
+    type: object
+    properties:
+      identity:
+        description: User identity information
+        type: object
+        $ref: '#/definitions/Identity'
+      data:
+        description: The new version of the data with changes to be saved
+        type: object
+        $ref: '#/definitions/Data'
+
+  ResponseBody:
+    description: The body of responses to successful requests
+    type: object
+    properties:
+      identity:
+        description: User identity information
+        type: object
+        $ref: '#/definitions/Identity'
+      data:
+        description: The latest (updated) version of the data
+        type: object
+        $ref: '#/definitions/Data'
+      rules:
+        description: The business rules
+        type: object
+        $ref: '#/definitions/Rules'
+      messages:
+        description: Messages to be displayed in the front end
+        type: object
+        $ref: '#/definitions/Messages'
+      status:
+        description: The status of the data (e.g. processing, processed, rejected etc.?)
+        type: string
+
+  ErrorResponseBody:
+    description: The body of all responses to failed or errored requests
+    type: object
+    properties:
+      errorMessage:
+        description: Message explaining why the request failed.
+        type: string
+
+  Identity:
+    description: The user's identity
+    type: object
+    properties:
+      userId:
+        type: string
+      registeredEmail:
+        type: string
+      fullName:
+        type: string
+
+  Data:
+    description: The data
+    type: object
+    properties:
+      amount:
+        type: number
+        format: double
+      date:
+        type: string
+        format: date
+      approved:
+        type: boolean
+
+  Rules:
+    description: Business rules
+    type: object
+    properties:
+      canEdit:
+        description: Whether the user is allowed to edit their data
+        type: boolean
+      lowerLimit:
+        description: The lowest amount the user is allowed to select
+        type: integer
+      upperLimit:
+        description: The maximum amount the user is allowed to select
+        type: integer
+
+  Messages:
+    description: Messages to display in the front-end
+    type: array
+    items: {
+      type: string
+    }
